@@ -36,7 +36,6 @@
         <li><a href="#features" class="nav-link" id="nav-features">Features</a></li>
         <li><a href="#architecture" class="nav-link" id="nav-arch">Security</a></li>
         <li><a href="#guide" class="nav-link" id="nav-guide">Setup Guide</a></li>
-        <li><a href="#diagnostics" class="nav-link" id="nav-diag">Diagnostics</a></li>
         <li><a href="#downloads" class="nav-btn-highlight" id="nav-download-apps">Download Apps ↓</a></li>
       </ul>
     </div>
@@ -638,54 +637,6 @@ fun triggerProtectedCommand(cmd: String) {
           </div>
 
           <div style="text-align: center; font-size: 0.75rem; color: #64748b;">Code expires in 5 minutes</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Live Relay Diagnostic & Health Inspector -->
-  <section class="section" id="diagnostics">
-    <div class="container">
-      <div class="section-header">
-        <div class="pill-tag" style="margin: 0 auto 12px auto;">Live Inspector</div>
-        <h2>Relay Health & Diagnostics</h2>
-        <p>Direct real-time health telemetry from the active relay server process.</p>
-      </div>
-
-      <div class="diagnostic-box">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-          <div>
-            <h3>WebSocket & HTTP Status</h3>
-            <p style="font-size: 0.9rem; margin-top: 4px;">Live health endpoint: <code>/health</code></p>
-          </div>
-          <button class="btn btn-secondary" id="btn-test-ws">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Test WebSocket Latency
-          </button>
-        </div>
-
-        <div class="diag-grid">
-          <div class="diag-card">
-            <div class="diag-title">Relay Port</div>
-            <div class="diag-value" id="diag-port">8080</div>
-          </div>
-          <div class="diag-card">
-            <div class="diag-title">HTTP Latency</div>
-            <div class="diag-value" id="diag-latency">&lt; 10ms</div>
-          </div>
-          <div class="diag-card">
-            <div class="diag-title">WebSocket Relay</div>
-            <div class="diag-value" id="diag-ws-status" style="color: #10b981;">CONNECTED</div>
-          </div>
-          <div class="diag-card">
-            <div class="diag-title">Pairing Store</div>
-            <div class="diag-value" style="color: #60a5fa;">ACTIVE (Disk)</div>
-          </div>
-        </div>
-
-        <div style="margin-top: 24px;">
-          <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Live Diagnostic Frame Log:</div>
-          <pre class="terminal-body" id="ws-test-log" style="background: var(--bg-terminal); border: 1px solid var(--border-subtle); border-radius: 8px; font-size: 0.82rem; height: 120px; overflow-y: auto;">Click 'Test WebSocket Latency' above to verify real-time handshake.</pre>
         </div>
       </div>
     </div>
