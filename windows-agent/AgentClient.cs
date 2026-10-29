@@ -19,6 +19,9 @@ public class AgentClient
     public string DeviceId => _deviceId;
     public string ServerUrl => _serverUrl;
     public string? PairedPhoneId { get; private set; }
+    public string? CurrentPairingCode { get; private set; }
+    public int CurrentPairingCodeExpiresIn { get; private set; }
+    public static bool HasPairedToken => !string.IsNullOrEmpty(LoadSavedToken());
 
     public event Action<bool>? ConnectionStatusChanged;
     public event Action<string>? AuthenticationFailed;
@@ -349,6 +352,8 @@ public class AgentClient
                 case "pairing_code_created":
                     string? pinCode = doc["code"]?.GetValue<string>();
                     int expiresIn = doc["expiresInSeconds"]?.GetValue<int>() ?? 300;
+                    CurrentPairingCode = pinCode;
+                    CurrentPairingCodeExpiresIn = expiresIn;
                     PairingCodeReceived?.Invoke(pinCode ?? string.Empty, expiresIn);
                     Console.WriteLine();
                     Console.WriteLine("==============================================================");
@@ -367,6 +372,7 @@ public class AgentClient
                 case "pairing_completed":
                     string? newToken = doc["token"]?.GetValue<string>();
                     string? phoneId = doc["phoneDeviceId"]?.GetValue<string>();
+                    CurrentPairingCode = null;
                     if (!string.IsNullOrEmpty(newToken))
                     {
                         _secretToken = newToken;
