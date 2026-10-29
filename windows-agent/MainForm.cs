@@ -59,8 +59,9 @@ public class MainForm : Form
 
         // Configure Form appearance
         Text = $"Remote Laptop Control - {_agent.DeviceId}";
-        Size = new Size(520, 620);
-        MinimumSize = new Size(480, 580);
+        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(540, 680);
+        MinimumSize = new Size(500, 640);
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Color.FromArgb(11, 15, 25);
         ForeColor = Color.White;
@@ -223,7 +224,7 @@ public class MainForm : Form
             Dock = DockStyle.Top,
             Height = 85,
             BackColor = Color.FromArgb(17, 24, 39),
-            Padding = new Padding(20, 15, 20, 15)
+            Padding = new Padding(22, 14, 22, 14)
         };
         pnlHeader.Paint += (s, e) =>
         {
@@ -231,36 +232,21 @@ public class MainForm : Form
             e.Graphics.DrawLine(pen, 0, pnlHeader.Height - 1, pnlHeader.Width, pnlHeader.Height - 1);
         };
 
-        var lblBrand = new Label
-        {
-            Text = "Remote Laptop Control",
-            Font = new Font("Segoe UI", 14f, FontStyle.Bold),
-            ForeColor = Color.White,
-            AutoSize = true,
-            Location = new Point(20, 14)
-        };
-
-        var lblSubBrand = new Label
-        {
-            Text = $"Device: {_agent.DeviceId}  •  Native Desktop Agent",
-            Font = new Font("Segoe UI", 8.8f, FontStyle.Regular),
-            ForeColor = Color.FromArgb(156, 163, 175),
-            AutoSize = true,
-            Location = new Point(21, 44)
-        };
-
-        // Status Pill Badge (Top Right)
+        // Status Pill Badge (Docked cleanly to far right)
         _pnlStatusBadge = new Panel
         {
-            Size = new Size(160, 32),
-            Location = new Point(320, 24),
-            BackColor = Color.FromArgb(24, 32, 47),
-            Anchor = AnchorStyles.Top | AnchorStyles.Right
+            Dock = DockStyle.Right,
+            Width = 155,
+            BackColor = Color.Transparent,
+            Padding = new Padding(0)
         };
         _pnlStatusBadge.Paint += (s, e) =>
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            using var path = GetRoundedPath(new Rectangle(0, 0, _pnlStatusBadge.Width - 1, _pnlStatusBadge.Height - 1), 16);
+            int w = _pnlStatusBadge.Width;
+            int h = _pnlStatusBadge.Height;
+            int badgeY = Math.Max(0, (h - 32) / 2);
+            using var path = GetRoundedPath(new Rectangle(0, badgeY, w - 1, 31), 15);
             using var brush = new SolidBrush(Color.FromArgb(24, 32, 47));
             e.Graphics.FillPath(brush, path);
             using var pen = new Pen(Color.FromArgb(45, 58, 82), 1f);
@@ -273,7 +259,7 @@ public class MainForm : Form
             Font = new Font("Segoe UI", 10f, FontStyle.Bold),
             ForeColor = Color.FromArgb(245, 158, 11),
             Size = new Size(18, 22),
-            Location = new Point(8, 4),
+            Location = new Point(8, 17),
             TextAlign = ContentAlignment.MiddleCenter
         };
 
@@ -282,16 +268,42 @@ public class MainForm : Form
             Text = "Connecting...",
             Font = new Font("Segoe UI", 8.2f, FontStyle.Bold),
             ForeColor = Color.FromArgb(245, 158, 11),
-            Size = new Size(130, 24),
-            Location = new Point(26, 4),
+            Size = new Size(125, 24),
+            Location = new Point(26, 16),
             TextAlign = ContentAlignment.MiddleLeft
         };
 
         _pnlStatusBadge.Controls.Add(_lblStatusDot);
         _pnlStatusBadge.Controls.Add(_lblStatusText);
 
-        pnlHeader.Controls.Add(lblBrand);
-        pnlHeader.Controls.Add(lblSubBrand);
+        var pnlHeaderTitles = new Panel
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.Transparent
+        };
+
+        var lblBrand = new Label
+        {
+            Text = "Remote Laptop Control",
+            Font = new Font("Segoe UI", 13.5f, FontStyle.Bold),
+            ForeColor = Color.White,
+            AutoSize = true,
+            Location = new Point(0, 4)
+        };
+
+        var lblSubBrand = new Label
+        {
+            Text = $"Device: {_agent.DeviceId}  •  Native Desktop Agent",
+            Font = new Font("Segoe UI", 8.8f, FontStyle.Regular),
+            ForeColor = Color.FromArgb(156, 163, 175),
+            AutoSize = true,
+            Location = new Point(1, 30)
+        };
+
+        pnlHeaderTitles.Controls.Add(lblBrand);
+        pnlHeaderTitles.Controls.Add(lblSubBrand);
+
+        pnlHeader.Controls.Add(pnlHeaderTitles);
         pnlHeader.Controls.Add(_pnlStatusBadge);
         Controls.Add(pnlHeader);
 
@@ -301,9 +313,9 @@ public class MainForm : Form
         var pnlBottom = new Panel
         {
             Dock = DockStyle.Bottom,
-            Height = 70,
+            Height = 68,
             BackColor = Color.FromArgb(17, 24, 39),
-            Padding = new Padding(20, 12, 20, 12)
+            Padding = new Padding(22, 14, 22, 14)
         };
         pnlBottom.Paint += (s, e) =>
         {
@@ -316,8 +328,8 @@ public class MainForm : Form
             Text = "Start with Windows",
             ForeColor = Color.FromArgb(209, 213, 219),
             Font = new Font("Segoe UI", 9f),
+            Dock = DockStyle.Left,
             AutoSize = true,
-            Location = new Point(24, 24),
             Checked = AutoStartManager.IsEnabled()
         };
         _chkAutoStart.CheckedChanged += (_, _) =>
@@ -335,9 +347,9 @@ public class MainForm : Form
         };
 
         _btnMinimize = CreateStyledButton("Minimize to Tray ↓", Color.FromArgb(37, 99, 235), Color.White);
-        _btnMinimize.Size = new Size(160, 38);
-        _btnMinimize.Location = new Point(320, 15);
-        _btnMinimize.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        _btnMinimize.Dock = DockStyle.Right;
+        _btnMinimize.Width = 160;
+        _btnMinimize.Height = 38;
         _btnMinimize.Click += (_, _) =>
         {
             HideToTray(showNotification: true);
@@ -353,7 +365,8 @@ public class MainForm : Form
         var pnlCenter = new Panel
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(20)
+            Padding = new Padding(20, 16, 20, 16),
+            AutoScroll = true
         };
 
         // 1. UNPAIRED PANEL
@@ -393,35 +406,53 @@ public class MainForm : Form
         var panel = new Panel
         {
             BackColor = Color.FromArgb(17, 24, 39),
-            Padding = new Padding(24)
+            Padding = new Padding(24, 20, 24, 20)
         };
         panel.Paint += (s, e) => DrawCardBorder(e.Graphics, panel.ClientRectangle);
+
+        var table = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 6,
+            BackColor = Color.Transparent
+        };
+        table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));            // 0: Title
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));            // 1: Instruction
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 105f));       // 2: PIN Box
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));            // 3: Expires Label
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 46f));        // 4: Refresh Button
+        table.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));       // 5: Waiting Label
 
         var lblTitle = new Label
         {
             Text = "📱 Link Your Android Phone",
             Font = new Font("Segoe UI", 13f, FontStyle.Bold),
             ForeColor = Color.White,
-            Dock = DockStyle.Top,
-            Height = 32
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 8),
+            AutoSize = true
         };
+        table.Controls.Add(lblTitle, 0, 0);
 
         var lblInstruction = new Label
         {
             Text = "Open Remote Laptop Control on your phone, tap 'Pair Laptop', and enter this 6-digit numeric PIN:",
             Font = new Font("Segoe UI", 9.2f),
             ForeColor = Color.FromArgb(156, 163, 175),
-            Dock = DockStyle.Top,
-            Height = 44
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 12),
+            AutoSize = true
         };
+        table.Controls.Add(lblInstruction, 0, 1);
 
         // Big PIN Display Box
         var pnlPinBox = new Panel
         {
-            Height = 110,
-            Dock = DockStyle.Top,
+            Dock = DockStyle.Fill,
             BackColor = Color.FromArgb(10, 14, 23),
-            Margin = new Padding(0, 10, 0, 10)
+            Margin = new Padding(0, 0, 0, 10)
         };
         pnlPinBox.Paint += (s, e) =>
         {
@@ -440,20 +471,23 @@ public class MainForm : Form
             TextAlign = ContentAlignment.MiddleCenter
         };
         pnlPinBox.Controls.Add(_lblPinCode);
+        table.Controls.Add(pnlPinBox, 0, 2);
 
         _lblPinExpires = new Label
         {
             Text = "⏱️ Requesting pairing code from relay...",
             Font = new Font("Segoe UI", 8.8f, FontStyle.Italic),
             ForeColor = Color.FromArgb(156, 163, 175),
-            Dock = DockStyle.Top,
-            Height = 28,
-            TextAlign = ContentAlignment.MiddleCenter
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 10),
+            TextAlign = ContentAlignment.MiddleCenter,
+            AutoSize = true
         };
+        table.Controls.Add(_lblPinExpires, 0, 3);
 
         _btnRefreshPin = CreateStyledButton("🔄 Refresh / Generate New PIN", Color.FromArgb(30, 41, 59), Color.White);
-        _btnRefreshPin.Dock = DockStyle.Top;
-        _btnRefreshPin.Height = 36;
+        _btnRefreshPin.Dock = DockStyle.Fill;
+        _btnRefreshPin.Margin = new Padding(30, 0, 30, 12);
         _btnRefreshPin.Click += async (_, _) =>
         {
             _btnRefreshPin.Enabled = false;
@@ -462,24 +496,19 @@ public class MainForm : Form
             await _agent.RequestPairingCodeAsync();
             _btnRefreshPin.Enabled = true;
         };
+        table.Controls.Add(_btnRefreshPin, 0, 4);
 
         _lblWaiting = new Label
         {
             Text = "⏳ Waiting for phone connection...\nOnce paired, this window will automatically minimize to your taskbar tray.",
-            Font = new Font("Segoe UI", 8.5f),
+            Font = new Font("Segoe UI", 8.6f),
             ForeColor = Color.FromArgb(107, 114, 128),
-            Dock = DockStyle.Bottom,
-            Height = 44,
+            Dock = DockStyle.Fill,
             TextAlign = ContentAlignment.MiddleCenter
         };
+        table.Controls.Add(_lblWaiting, 0, 5);
 
-        panel.Controls.Add(_lblWaiting);
-        panel.Controls.Add(_btnRefreshPin);
-        panel.Controls.Add(_lblPinExpires);
-        panel.Controls.Add(pnlPinBox);
-        panel.Controls.Add(lblInstruction);
-        panel.Controls.Add(lblTitle);
-
+        panel.Controls.Add(table);
         return panel;
     }
 
@@ -488,65 +517,81 @@ public class MainForm : Form
         var panel = new Panel
         {
             BackColor = Color.FromArgb(17, 24, 39),
-            Padding = new Padding(24)
+            Padding = new Padding(24, 20, 24, 20)
         };
         panel.Paint += (s, e) => DrawCardBorder(e.Graphics, panel.ClientRectangle, Color.FromArgb(16, 185, 129));
+
+        var table = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 5,
+            BackColor = Color.Transparent
+        };
+        table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70f)); // Icon
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));      // Title
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));      // Phone
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));      // Countdown
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 46f)); // Button
 
         var lblIcon = new Label
         {
             Text = "🎉",
-            Font = new Font("Segoe UI", 48f),
-            Dock = DockStyle.Top,
-            Height = 80,
+            Font = new Font("Segoe UI", 42f),
+            Dock = DockStyle.Fill,
             TextAlign = ContentAlignment.MiddleCenter
         };
+        table.Controls.Add(lblIcon, 0, 0);
 
         var lblTitle = new Label
         {
             Text = "First Connection Established!",
-            Font = new Font("Segoe UI", 16f, FontStyle.Bold),
+            Font = new Font("Segoe UI", 15f, FontStyle.Bold),
             ForeColor = Color.FromArgb(16, 185, 129),
-            Dock = DockStyle.Top,
-            Height = 36,
-            TextAlign = ContentAlignment.MiddleCenter
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 4, 0, 8),
+            TextAlign = ContentAlignment.MiddleCenter,
+            AutoSize = true
         };
+        table.Controls.Add(lblTitle, 0, 1);
 
         _lblSuccessPhone = new Label
         {
             Text = "Successfully paired with your mobile phone.",
             Font = new Font("Segoe UI", 10.5f, FontStyle.Regular),
             ForeColor = Color.FromArgb(209, 213, 219),
-            Dock = DockStyle.Top,
-            Height = 40,
-            TextAlign = ContentAlignment.MiddleCenter
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 12),
+            TextAlign = ContentAlignment.MiddleCenter,
+            AutoSize = true
         };
+        table.Controls.Add(_lblSuccessPhone, 0, 2);
 
         _lblSuccessCountdown = new Label
         {
             Text = "🚀 Automatically minimizing to system tray in 3s...",
             Font = new Font("Segoe UI", 10f, FontStyle.Bold),
             ForeColor = Color.FromArgb(56, 189, 248),
-            Dock = DockStyle.Top,
-            Height = 40,
-            TextAlign = ContentAlignment.MiddleCenter
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 16),
+            TextAlign = ContentAlignment.MiddleCenter,
+            AutoSize = true
         };
+        table.Controls.Add(_lblSuccessCountdown, 0, 3);
 
         var btnMinimizeNow = CreateStyledButton("Minimize Now →", Color.FromArgb(16, 185, 129), Color.Black);
-        btnMinimizeNow.Dock = DockStyle.Bottom;
-        btnMinimizeNow.Height = 44;
+        btnMinimizeNow.Dock = DockStyle.Fill;
+        btnMinimizeNow.Margin = new Padding(40, 0, 40, 0);
         btnMinimizeNow.Click += (_, _) =>
         {
             _autoTrayTimer?.Stop();
             SwitchToPairedState(_agent.PairedPhoneId ?? "Phone");
             HideToTray(showNotification: true);
         };
+        table.Controls.Add(btnMinimizeNow, 0, 4);
 
-        panel.Controls.Add(btnMinimizeNow);
-        panel.Controls.Add(_lblSuccessCountdown);
-        panel.Controls.Add(_lblSuccessPhone);
-        panel.Controls.Add(lblTitle);
-        panel.Controls.Add(lblIcon);
-
+        panel.Controls.Add(table);
         return panel;
     }
 
@@ -555,63 +600,78 @@ public class MainForm : Form
         var panel = new Panel
         {
             BackColor = Color.FromArgb(17, 24, 39),
-            Padding = new Padding(24)
+            Padding = new Padding(24, 20, 24, 20)
         };
         panel.Paint += (s, e) => DrawCardBorder(e.Graphics, panel.ClientRectangle, Color.FromArgb(16, 185, 129));
+
+        var table = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 6,
+            BackColor = Color.Transparent
+        };
+        table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));      // Title
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));      // Device Name
+        table.RowStyles.Add(new RowStyle(SizeType.AutoSize));      // Description
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 46f)); // Lock button
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 46f)); // Minimize button
+        table.RowStyles.Add(new RowStyle(SizeType.Absolute, 42f)); // Unpair button
 
         var lblTitle = new Label
         {
             Text = "🛡️ Laptop Guarded & Connected",
-            Font = new Font("Segoe UI", 14f, FontStyle.Bold),
+            Font = new Font("Segoe UI", 13.5f, FontStyle.Bold),
             ForeColor = Color.FromArgb(16, 185, 129),
-            Dock = DockStyle.Top,
-            Height = 32
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 8),
+            AutoSize = true
         };
+        table.Controls.Add(lblTitle, 0, 0);
 
         _lblPairedDeviceName = new Label
         {
-            Text = "Paired Phone: Active",
+            Text = "📱 Paired Phone: Active",
             Font = new Font("Segoe UI", 10.5f, FontStyle.Bold),
             ForeColor = Color.White,
-            Dock = DockStyle.Top,
-            Height = 28
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 6),
+            AutoSize = true
         };
+        table.Controls.Add(_lblPairedDeviceName, 0, 1);
 
         _lblPairedStatusDesc = new Label
         {
             Text = "Your laptop is securely linked with your phone.\nRemote actions (LOCK, SLEEP, RESTART, SHUTDOWN) are actively guarded.",
             Font = new Font("Segoe UI", 9f),
             ForeColor = Color.FromArgb(156, 163, 175),
-            Dock = DockStyle.Top,
-            Height = 46
+            Dock = DockStyle.Fill,
+            Margin = new Padding(0, 0, 0, 18),
+            AutoSize = true
         };
-
-        var pnlActions = new Panel
-        {
-            Dock = DockStyle.Bottom,
-            Height = 150
-        };
+        table.Controls.Add(_lblPairedStatusDesc, 0, 2);
 
         var btnLockTest = CreateStyledButton("🔒 Quick Test: Lock Workstation", Color.FromArgb(30, 41, 59), Color.White);
-        btnLockTest.Dock = DockStyle.Top;
-        btnLockTest.Height = 38;
+        btnLockTest.Dock = DockStyle.Fill;
+        btnLockTest.Margin = new Padding(0, 0, 0, 8);
         btnLockTest.Click += (_, _) =>
         {
             SystemOperations.Lock();
         };
+        table.Controls.Add(btnLockTest, 0, 3);
 
         var btnMinimizeActive = CreateStyledButton("Minimize to Tray", Color.FromArgb(37, 99, 235), Color.White);
-        btnMinimizeActive.Dock = DockStyle.Top;
-        btnMinimizeActive.Height = 40;
-        btnMinimizeActive.Margin = new Padding(0, 10, 0, 0);
+        btnMinimizeActive.Dock = DockStyle.Fill;
+        btnMinimizeActive.Margin = new Padding(0, 0, 0, 8);
         btnMinimizeActive.Click += (_, _) =>
         {
             HideToTray(showNotification: true);
         };
+        table.Controls.Add(btnMinimizeActive, 0, 4);
 
         var btnUnpair = CreateStyledButton("Disconnect / Unpair Phone", Color.FromArgb(220, 38, 38), Color.White);
-        btnUnpair.Dock = DockStyle.Bottom;
-        btnUnpair.Height = 36;
+        btnUnpair.Dock = DockStyle.Fill;
         btnUnpair.Click += (_, _) =>
         {
             if (MessageBox.Show("Are you sure you want to unpair this phone?", "Confirm Unpair", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
@@ -621,16 +681,9 @@ public class MainForm : Form
                 Task.Run(async () => await _agent.RequestPairingCodeAsync());
             }
         };
+        table.Controls.Add(btnUnpair, 0, 5);
 
-        pnlActions.Controls.Add(btnUnpair);
-        pnlActions.Controls.Add(btnMinimizeActive);
-        pnlActions.Controls.Add(btnLockTest);
-
-        panel.Controls.Add(pnlActions);
-        panel.Controls.Add(_lblPairedStatusDesc);
-        panel.Controls.Add(_lblPairedDeviceName);
-        panel.Controls.Add(lblTitle);
-
+        panel.Controls.Add(table);
         return panel;
     }
 
