@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laptop Device Dashboard | Remote Laptop Control</title>
+  <meta name="description" content="PIN-protected Laptop Device Dashboard for Remote Laptop Control. Monitor live telemetry, generate dynamic 6-digit pairing PINs, and trigger workstation power actions.">
+  <meta name="theme-color" content="#090c15">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="dash-nav">
+    <div class="container nav-container">
+      <a href="/" class="brand" id="nav-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <span>Remote<span class="text-gradient">Laptop</span> <span style="font-size: 0.82rem; font-weight: 500; color: var(--text-muted); margin-left: 6px;">| Laptop Dashboard</span></span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="/" class="nav-link" id="nav-back-landing" style="display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Landing Page
+        </a>
+
+        <div class="status-badge" id="dash-relay-pill">
+          <span class="status-dot" id="dash-relay-dot"></span>
+          <span id="dash-relay-text">Connecting to Relay...</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- =========================================================================
+       SCREEN 1: PIN GATEWAY (Setup PIN or Unlock PIN)
+       ========================================================================= -->
+  <main class="pin-gateway" id="pin-screen">
+    <div class="pin-card" id="pin-card-box">
+      <div class="pin-icon-wrap" id="pin-icon-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+
+      <h2 id="pin-title" style="font-size: 1.8rem; margin-bottom: 8px;">Setup Security PIN</h2>
+      <p id="pin-subtitle" style="font-size: 0.92rem; color: var(--text-muted); min-height: 44px;">
+        Create a 6-digit master PIN to secure your workstation controls on this laptop.
+      </p>
+
+      <!-- Feedback / Alert Message Banner -->
+      <div id="pin-feedback" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; font-weight: 500;"></div>
+
+      <!-- 6-digit Visual PIN Boxes -->
+      <div class="pin-display-boxes" id="pin-boxes">
+        <div class="pin-box" data-idx="0"></div>
+        <div class="pin-box" data-idx="1"></div>
+        <div class="pin-box" data-idx="2"></div>
+        <div class="pin-box" data-idx="3"></div>
+        <div class="pin-box" data-idx="4"></div>
+        <div class="pin-box" data-idx="5"></div>
+      </div>
+
+      <!-- Hidden Input for Physical Keyboard Interaction -->
+      <input type="password" id="pin-hidden-input" maxlength="6" inputmode="numeric" autocomplete="off" style="position: absolute; opacity: 0; pointer-events: none; left: -9999px;">
+
+      <!-- On-Screen Numeric Keypad -->
+      <div class="pin-keypad" id="pin-keypad">
+        <button type="button" class="key-btn" data-key="1">1</button>
+        <button type="button" class="key-btn" data-key="2">2</button>
+        <button type="button" class="key-btn" data-key="3">3</button>
+        <button type="button" class="key-btn" data-key="4">4</button>
+        <button type="button" class="key-btn" data-key="5">5</button>
+        <button type="button" class="key-btn" data-key="6">6</button>
+        <button type="button" class="key-btn" data-key="7">7</button>
+        <button type="button" class="key-btn" data-key="8">8</button>
+        <button type="button" class="key-btn" data-key="9">9</button>
+        <button type="button" class="key-btn action" data-key="clear" title="Clear all">Clear</button>
+        <button type="button" class="key-btn" data-key="0">0</button>
+        <button type="button" class="key-btn action" data-key="backspace" title="Delete digit">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+        </button>
+      </div>
+
+      <!-- Security Subtext & Helper Controls -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 8px;">
+        <button type="button" id="btn-reset-pin" style="background: none; border: none; color: var(--accent-blue); font-size: 0.85rem; cursor: pointer; text-decoration: underline;">
+          Reset / Set New PIN
+        </button>
+        <span style="font-size: 0.78rem; color: var(--text-dim);">
+          Protected by SHA-256 Web Crypto • Never stored in plaintext
+        </span>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- =========================================================================
+       SCREEN 2: LAPTOP DEVICE DASHBOARD (Revealed only after PIN verification)
+       ========================================================================= -->
+  <main class="dashboard-view" id="dashboard-screen" style="display: none;">
+    <div class="container">
+
+      <!-- Dashboard Device Header -->
+      <div class="glass-card dash-header">
+        <div class="dash-device-info">
+          <div class="dash-laptop-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+              <h2 id="dash-hostname" style="font-size: 1.6rem; margin: 0;">ABHINAV</h2>
+              <span class="pill-tag" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #10b981; font-size: 0.75rem; padding: 3px 10px;">
+                WINDOWS HOST ONLINE
+              </span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+              Windows 11 64-bit • Native Agent Process Active • 1-to-1 Bound
+            </p>
+          </div>
+        </div>
+
+        <!-- Dashboard Action Controls -->
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary" id="btn-lock-dash" style="padding: 9px 18px; font-size: 0.88rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Lock Dashboard
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-change-pin" style="padding: 9px 18px; font-size: 0.88rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Change PIN
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Status Grid -->
+      <div class="dash-grid-top">
+        <div class="glass-card dash-tile">
+          <div class="dash-tile-header">
+            <span class="dash-tile-title">Workstation Agent</span>
+            <span style="font-size: 1.1rem; color: #10b981;">●</span>
+          </div>
+          <div class="dash-tile-val" id="telemetry-agent">Active</div>
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Background Tray Process PID OK</span>
+        </div>
+
+        <div class="glass-card dash-tile">
+          <div class="dash-tile-header">
+            <span class="dash-tile-title">Relay Link</span>
+            <span style="font-size: 1.1rem; color: #3b82f6;">⚡</span>
+          </div>
+          <div class="dash-tile-val" id="telemetry-relay">Connected</div>
+          <span style="font-size: 0.8rem; color: var(--text-dim);" id="telemetry-latency">Latency: &lt; 10ms</span>
+        </div>
+
+        <div class="glass-card dash-tile">
+          <div class="dash-tile-header">
+            <span class="dash-tile-title">Paired Mobile Device</span>
+            <span style="font-size: 1.1rem; color: #a855f7;">📱</span>
+          </div>
+          <div class="dash-tile-val" id="telemetry-phone">Pixel 7 Pro</div>
+          <span style="font-size: 0.8rem; color: var(--text-dim);" id="telemetry-phone-status">emulator-5554 (Authorized)</span>
+        </div>
+
+        <div class="glass-card dash-tile">
+          <div class="dash-tile-header">
+            <span class="dash-tile-title">Security PIN Guard</span>
+            <span style="font-size: 1.1rem; color: #f59e0b;">🛡️</span>
+          </div>
+          <div class="dash-tile-val">Guarded</div>
+          <span style="font-size: 0.8rem; color: var(--text-dim);">SHA-256 Master PIN Enforced</span>
+        </div>
+      </div>
+
+      <!-- Main Operational Split: Pairing Center vs Workstation Power Controls -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 32px;">
+
+        <!-- Operational Panel 1: Dynamic Pairing Center -->
+        <div class="glass-card pairing-center-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div class="pill-tag" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); color: #38bdf8;">
+              Dynamic Pairing Center
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-dim);" id="pairing-status-badge">TTL 5m</span>
+          </div>
+
+          <h3>Pair Mobile Companion</h3>
+          <p style="font-size: 0.88rem; line-height: 1.5; margin: 8px 0 20px 0;">
+            Enter this temporary 6-digit numeric PIN inside your Android app to link your phone strictly to this laptop.
+          </p>
+
+          <div style="text-align: center; padding: 24px; background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-md); border: 1px solid var(--border-glow);">
+            <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim);">Temporary 6-Digit Pairing Code</span>
+            
+            <div class="pin-huge-display" id="pairing-code-val">
+              8 4 9 2 0 1
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Expires in: <strong id="pairing-countdown" style="color: #38bdf8;">04:55</strong></span>
+            </div>
+
+            <div class="timer-bar-wrap">
+              <div class="timer-bar" id="pairing-timer-bar" style="width: 90%;"></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; gap: 12px;">
+            <button type="button" class="btn btn-primary" id="btn-generate-pin" style="flex: 1; font-size: 0.9rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              Generate New Pairing PIN
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-copy-pairing" style="padding: 12px 16px;" title="Copy pairing PIN">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Operational Panel 2: Workstation Power Controls -->
+        <div class="glass-card" style="padding: 36px;">
+          <div class="pill-tag" style="background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.3); color: #a855f7; margin-bottom: 12px;">
+            Workstation Power Controls
+          </div>
+          <h3>Workstation Quick Actions</h3>
+          <p style="font-size: 0.88rem; line-height: 1.5; margin: 8px 0 20px 0;">
+            Execute native Windows system actions. Signals are routed securely to the Windows Agent.
+          </p>
+
+          <div class="dash-actions-grid">
+            <!-- Lock Workstation -->
+            <button type="button" class="power-btn-card lock" id="action-lock-laptop">
+              <div class="power-icon-wrap lock">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </div>
+              <div>
+                <strong style="display: block; font-size: 1.05rem; color: #f8fafc; margin-bottom: 2px;">Lock Laptop</strong>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">Win32 LockWorkStation()</span>
+              </div>
+            </button>
+
+            <!-- Sleep / Standby -->
+            <button type="button" class="power-btn-card sleep" id="action-sleep-laptop">
+              <div class="power-icon-wrap sleep">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              </div>
+              <div>
+                <strong style="display: block; font-size: 1.05rem; color: #f8fafc; margin-bottom: 2px;">Sleep / Standby</strong>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">Suspend via powrprof.dll</span>
+              </div>
+            </button>
+
+            <!-- Restart Laptop -->
+            <button type="button" class="power-btn-card restart" id="action-restart-laptop">
+              <div class="power-icon-wrap restart">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+              </div>
+              <div>
+                <strong style="display: block; font-size: 1.05rem; color: #f8fafc; margin-bottom: 2px;">Restart Laptop</strong>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">Reboots system (Safety Prompt)</span>
+              </div>
+            </button>
+
+            <!-- Shut Down Laptop -->
+            <button type="button" class="power-btn-card shutdown" id="action-shutdown-laptop">
+              <div class="power-icon-wrap shutdown">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+              </div>
+              <div>
+                <strong style="display: block; font-size: 1.05rem; color: #f8fafc; margin-bottom: 2px;">Shut Down</strong>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">Powers off machine (Safety Prompt)</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Cryptographic Activity & Command Audit Log -->
+      <div class="glass-card audit-log-container">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;"></div>
+            <h3 style="font-size: 1.15rem; margin: 0;">Workstation Security & Activity Audit Log</h3>
+          </div>
+          <button type="button" class="btn btn-secondary" id="btn-clear-logs" style="padding: 6px 14px; font-size: 0.8rem;">
+            Clear History
+          </button>
+        </div>
+
+        <div class="audit-list" id="audit-list">
+          <div class="audit-item success">
+            <span><strong>[PIN AUTH]</strong> Laptop Dashboard unlocked successfully via Master PIN</span>
+            <span style="color: var(--text-dim); font-size: 0.78rem;">Just now</span>
+          </div>
+          <div class="audit-item">
+            <span><strong>[AGENT]</strong> Windows Agent 'ABHINAV' active on port 8080</span>
+            <span style="color: var(--text-dim); font-size: 0.78rem;">1m ago</span>
+          </div>
+          <div class="audit-item">
+            <span><strong>[PAIRING]</strong> 1-to-1 bound to Android device: Pixel 7 Pro (emulator-5554)</span>
+            <span style="color: var(--text-dim); font-size: 0.78rem;">2m ago</span>
+          </div>
+          <div class="audit-item">
+            <span><strong>[ISOLATION]</strong> Foreign device connections automatically blocked by relay</span>
+            <span style="color: var(--text-dim); font-size: 0.78rem;">5m ago</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+
+  <!-- =========================================================================
+       SAFETY CONFIRMATION MODAL (For Restart & Shutdown)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="safety-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-icon warning" id="modal-icon-wrap">⚠️</div>
+        <div>
+          <h3 id="modal-title" style="font-size: 1.25rem;">Confirm Workstation Action</h3>
+          <span style="font-size: 0.8rem; color: var(--text-dim);" id="modal-target">Target: ABHINAV</span>
+        </div>
+      </div>
+
+      <p id="modal-desc" style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.5;">
+        Are you sure you want to execute this action on your laptop? Any unsaved work should be closed.
+      </p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="modal-btn-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modal-btn-confirm" style="background: var(--accent-red); border-color: var(--accent-red);">
+          Confirm & Execute
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Dashboard JavaScript Logic -->
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

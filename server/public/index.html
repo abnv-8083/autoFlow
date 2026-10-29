@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remote Laptop Control | Native Windows Desktop Agent & Android Mobile App</title>
+  <meta name="description" content="Secure, biometric-guarded remote control system for Windows laptops via an Android mobile app with silent system tray background agent and 1-to-1 dynamic cryptographic pairing.">
+  <meta name="theme-color" content="#090c15">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="main-nav">
+    <div class="container nav-container">
+      <a href="#" class="brand" id="nav-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <span>Remote<span class="text-gradient">Laptop</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#downloads" class="nav-link" id="nav-downloads">Downloads</a></li>
+        <li><a href="#features" class="nav-link" id="nav-features">Features</a></li>
+        <li><a href="#architecture" class="nav-link" id="nav-arch">Security</a></li>
+        <li><a href="#guide" class="nav-link" id="nav-guide">Setup Guide</a></li>
+        <li><a href="#diagnostics" class="nav-link" id="nav-diag">Diagnostics</a></li>
+        <li><a href="#downloads" class="nav-btn-highlight" id="nav-download-apps">Download Apps ↓</a></li>
+      </ul>
+
+      <div class="status-badge" id="relay-status-pill">
+        <span class="status-dot" id="relay-status-dot"></span>
+        <span id="relay-status-text">Relay Online</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="section" id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="pill-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Native Windows Agent • Android Biometric App
+          </div>
+
+          <h1>
+            Control Your Laptop <br>
+            From <span class="text-gradient">Anywhere</span> Securely.
+          </h1>
+
+          <p class="hero-description">
+            Turn your Android phone into an encrypted hardware-guarded remote control for your Windows laptop. Lock, Sleep, Restart, or Shut Down your PC remotely with zero latency. Download the native Windows background tray agent and the mobile companion app below.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#download-laptop" class="btn btn-primary btn-windows" id="btn-hero-dl-laptop">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.801"/>
+              </svg>
+              Download for Laptop (Windows)
+            </a>
+            <a href="#download-mobile" class="btn btn-secondary btn-android" id="btn-hero-dl-mobile">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.081 12 8.081s-3.5902.3301-5.1367.8697L4.841 5.4477a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.152.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+              </svg>
+              Download for Mobile (Android)
+            </a>
+          </div>
+
+          <!-- Live Server Metrics -->
+          <div class="hero-metrics">
+            <div class="metric-item">
+              <span class="metric-value" id="metric-laptops">1</span>
+              <span class="metric-label">Laptops Online</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-value" id="metric-latency">&lt; 15ms</span>
+              <span class="metric-label">Relay Latency</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-value">256-bit</span>
+              <span class="metric-label">Dynamic Token</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-image-wrap">
+            <img src="/assets/hero.jpg" alt="Remote Laptop Control Encrypted Tunnel Visual" id="hero-img">
+            
+            <div class="floating-badge badge-top">
+              <div class="badge-icon purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div>
+                <strong style="display:block; font-size:0.85rem; color:#f8fafc;">Biometric Guard</strong>
+                <span style="font-size:0.75rem; color:#94a3b8;">Enforced on Power Actions</span>
+              </div>
+            </div>
+
+            <div class="floating-badge badge-bottom">
+              <div class="badge-icon blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <div>
+                <strong style="display:block; font-size:0.85rem; color:#f8fafc;">1-to-1 Device Isolation</strong>
+                <span style="font-size:0.75rem; color:#94a3b8;">Foreign Devices Blocked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Application Downloads Section -->
+  <section class="section" id="downloads" style="padding-top: 30px; padding-bottom: 70px;">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Application Downloads</div>
+        <h2>Download for Laptop & Mobile</h2>
+        <p>Get started by downloading the Windows Desktop Agent on your PC and the Android Companion App on your smartphone.</p>
+      </div>
+
+      <div class="portal-choice-grid">
+        <!-- Download Card 1: Laptop Windows Desktop Application -->
+        <div class="glass-card portal-card laptop" id="download-laptop">
+          <div>
+            <div class="portal-header">
+              <div class="portal-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.801"/>
+                </svg>
+              </div>
+              <div>
+                <div class="pill-tag" style="background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #38bdf8; margin-bottom: 6px;">Laptop • Windows Desktop App</div>
+                <h3 style="font-size: 1.5rem;">Windows Desktop Agent</h3>
+              </div>
+            </div>
+
+            <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+              Native Windows background service engineered in C# .NET 8. Sits quietly in your Windows System Tray (Taskbar Notification area), receives power commands from your phone, and generates dynamic pairing PINs on demand.
+            </p>
+
+            <div class="portal-meta">
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Silent System Tray Resident:</strong> Runs in taskbar notification area with right-click menu controls</span>
+              </div>
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Instant Win32 Execution:</strong> Native <code>LockWorkStation()</code> & <code>powrprof.dll</code> APIs</span>
+              </div>
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Auto-Start on Boot:</strong> 1-click HKCU Run registry toggle keeps your machine guarded 24/7</span>
+              </div>
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Tray PIN Generator:</strong> Click "Pair New Phone..." in tray to display fresh 6-digit numeric PIN</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px; padding: 14px 16px; background: rgba(59, 130, 246, 0.08); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.2); display: flex; align-items: center; gap: 14px;">
+              <span style="font-size: 1.5rem;">💻</span>
+              <span style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">
+                <strong>Quick Start:</strong> Download the standalone <code>.exe</code> or zip package. Launch with <code>--tray</code> to minimize directly to the Windows system tray.
+              </span>
+            </div>
+          </div>
+
+          <div class="download-dual-actions">
+            <a href="/downloads/RemoteLaptopAgent.exe" class="btn btn-primary btn-windows" id="btn-download-laptop-exe" download>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Windows Agent (.EXE)
+            </a>
+
+            <a href="/downloads/RemoteLaptopAgent-Windows.zip" class="btn btn-secondary btn-outline-glow" id="btn-download-laptop-zip" download>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                <rect x="1" y="3" width="22" height="5"></rect>
+                <line x1="10" y1="12" x2="14" y2="12"></line>
+              </svg>
+              Download Full Package (.ZIP) • Includes Tray Launcher
+            </a>
+
+            <div class="file-spec-pill">
+              <span style="font-size: 0.82rem; color: var(--text-dim);">Platform: <strong style="color: #38bdf8;">Windows 10 / 11 (64-bit)</strong></span>
+              <span style="font-size: 0.82rem; color: #38bdf8; font-weight: 600;">EXE: 201 KB | ZIP: 66 MB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Download Card 2: Mobile Android Companion App -->
+        <div class="glass-card portal-card android" id="download-mobile">
+          <div>
+            <div class="portal-header">
+              <div class="portal-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.081 12 8.081s-3.5902.3301-5.1367.8697L4.841 5.4477a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.152.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+                </svg>
+              </div>
+              <div>
+                <div class="pill-tag" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #10b981; margin-bottom: 6px;">Mobile • Android App</div>
+                <h3 style="font-size: 1.5rem;">Android Companion App</h3>
+              </div>
+            </div>
+
+            <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+              Native Android mobile application engineered with Kotlin and Jetpack Compose. Remotely Lock, Sleep, Restart, or Shut Down your laptop from anywhere with hardware biometric security.
+            </p>
+
+            <div class="portal-meta">
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Hardware Biometric Guard:</strong> Fingerprint & Device Lock authentication</span>
+              </div>
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>5-Second Dynamic Pairing:</strong> Connect securely via 6-digit numeric PIN</span>
+              </div>
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Ultra-low Latency:</strong> Instant WebSocket relay with token validation</span>
+              </div>
+              <div class="portal-meta-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span><strong>Strict 1-to-1 Device Isolation:</strong> Cryptographic token binds phone to laptop</span>
+              </div>
+            </div>
+
+            <!-- QR code preview for direct mobile download -->
+            <div class="qr-preview-box">
+              <div class="qr-code-canvas">
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- QR Finder Pattern Top-Left -->
+                  <rect x="5" y="5" width="30" height="30" rx="4" fill="#090c15"/>
+                  <rect x="11" y="11" width="18" height="18" rx="2" fill="#fff"/>
+                  <rect x="15" y="15" width="10" height="10" rx="1" fill="#090c15"/>
+                  <!-- QR Finder Pattern Top-Right -->
+                  <rect x="65" y="5" width="30" height="30" rx="4" fill="#090c15"/>
+                  <rect x="71" y="11" width="18" height="18" rx="2" fill="#fff"/>
+                  <rect x="75" y="15" width="10" height="10" rx="1" fill="#090c15"/>
+                  <!-- QR Finder Pattern Bottom-Left -->
+                  <rect x="5" y="65" width="30" height="30" rx="4" fill="#090c15"/>
+                  <rect x="11" y="71" width="18" height="18" rx="2" fill="#fff"/>
+                  <rect x="15" y="75" width="10" height="10" rx="1" fill="#090c15"/>
+                  <!-- Data Blocks -->
+                  <rect x="42" y="8" width="8" height="8" fill="#090c15"/>
+                  <rect x="42" y="24" width="8" height="8" fill="#090c15"/>
+                  <rect x="52" y="16" width="8" height="8" fill="#090c15"/>
+                  <rect x="40" y="40" width="20" height="20" rx="3" fill="#10b981"/>
+                  <path d="M46 50L49 53L54 47" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                  <rect x="8" y="42" width="8" height="8" fill="#090c15"/>
+                  <rect x="24" y="42" width="8" height="8" fill="#090c15"/>
+                  <rect x="68" y="42" width="8" height="8" fill="#090c15"/>
+                  <rect x="84" y="42" width="8" height="8" fill="#090c15"/>
+                  <rect x="42" y="68" width="8" height="8" fill="#090c15"/>
+                  <rect x="52" y="80" width="8" height="8" fill="#090c15"/>
+                  <rect x="68" y="68" width="12" height="12" fill="#090c15"/>
+                  <rect x="84" y="80" width="8" height="8" fill="#090c15"/>
+                </svg>
+              </div>
+              <div>
+                <strong style="display: block; font-size: 0.88rem; color: #f8fafc; margin-bottom: 2px;">Direct Phone Download</strong>
+                <span style="font-size: 0.78rem; color: #94a3b8; line-height: 1.4; display: block;">
+                  Scan this QR code with your Android camera or tap below to download the APK.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="download-dual-actions">
+            <a href="/downloads/RemoteLaptopControl.apk" class="btn btn-primary btn-android" id="btn-download-portal-apk" download>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download Android App (.APK)
+            </a>
+
+            <div class="file-spec-pill">
+              <span style="font-size: 0.82rem; color: var(--text-dim);">File: <strong style="color: var(--text-main);">RemoteLaptopControl.apk</strong></span>
+              <span style="font-size: 0.82rem; color: #10b981; font-weight: 600;">v1.0.0 (18.3 MB) • Android 8.0+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Core Capabilities</div>
+        <h2>Engineered for Reliability & Security</h2>
+        <p>Built with modern technologies across .NET 8, Node.js WebSocket relays, and Android Jetpack Compose.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="glass-card feature-card">
+          <div class="feature-icon-box" style="color: #3b82f6;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <h3>Instant Workstation Lock</h3>
+          <p>Triggers native Win32 <code>LockWorkStation()</code> instantaneously from your phone. Perfect when you walk away from your desk.</p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-icon-box" style="color: #f59e0b;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </div>
+          <h3>Sleep & Standby Mode</h3>
+          <p>Dispatches Windows Power Management suspend signals via <code>powrprof.dll</code> to put your machine into standby remotely.</p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-icon-box" style="color: #8b5cf6;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 0-7.07 17.07A10 10 0 0 0 19.07 4.93 9.93 9.93 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8.01 8.01 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h3>Biometric-Guarded Actions</h3>
+          <p>Restart and Shutdown commands are wrapped in <code>androidx.biometric.BiometricPrompt</code> with fingerprint and device lock PIN verification.</p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-icon-box" style="color: #10b981;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          </div>
+          <h3>Windows System Tray App</h3>
+          <p>Runs silently in the background tray with live status indicators, right-click menu, balloon alerts, and Windows auto-start toggle.</p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-icon-box" style="color: #06b6d4;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+          </div>
+          <h3>Dynamic 6-Digit PIN Pairing</h3>
+          <p>No hardcoded secrets. Generate a temporary 6-digit numeric PIN on your laptop and verify on your phone to exchange secure tokens.</p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-icon-box" style="color: #ef4444;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+          </div>
+          <h3>Strict 1-to-1 Isolation</h3>
+          <p>Only Phone A can command Laptop A. Phone B, Phone C, or any foreign client is strictly blocked with zero access.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture & Security Visualizer -->
+  <section class="section" id="architecture" style="background: rgba(15, 20, 36, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Security Architecture</div>
+        <h2>Strict 1-to-1 Device Isolation</h2>
+        <p>How the relay router isolates legitimate paired devices and blocks unauthorized connections.</p>
+      </div>
+
+      <div class="isolation-box">
+        <div class="arch-flow">
+          <!-- Phone A -->
+          <div class="arch-node authorized">
+            <span style="font-size: 2rem;">📱</span>
+            <strong>Phone A (Paired)</strong>
+            <span style="font-size:0.75rem; color:#10b981;">Token: rlc_5ee061...</span>
+            <span class="pill-tag" style="font-size:0.7rem; padding:2px 8px; background:rgba(16,185,129,0.2); border-color:#10b981; color:#10b981;">AUTHORIZED</span>
+          </div>
+
+          <!-- Arrow 1 -->
+          <div class="arch-arrow">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            <span class="arrow-label">Command</span>
+          </div>
+
+          <!-- Relay Server -->
+          <div class="arch-node" style="border-color: var(--accent-blue); box-shadow: 0 0 25px rgba(59, 130, 246, 0.25);">
+            <span style="font-size: 2rem;">⚡</span>
+            <strong>WebSocket Relay</strong>
+            <span style="font-size:0.75rem; color:var(--text-muted);">PairingStore Validator</span>
+            <span style="font-size:0.72rem; color:#60a5fa;">Peer-to-Peer Binding</span>
+          </div>
+
+          <!-- Arrow 2 -->
+          <div class="arch-arrow">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            <span class="arrow-label">Dispatch</span>
+          </div>
+
+          <!-- Laptop A -->
+          <div class="arch-node authorized">
+            <span style="font-size: 2rem;">💻</span>
+            <strong>Laptop A (Windows)</strong>
+            <span style="font-size:0.75rem; color:#10b981;">Token: rlc_5ee061...</span>
+            <span class="pill-tag" style="font-size:0.7rem; padding:2px 8px; background:rgba(16,185,129,0.2); border-color:#10b981; color:#10b981;">EXECUTED</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 32px; padding: 20px; background: rgba(239, 68, 68, 0.08); border: 1px dashed rgba(239, 68, 68, 0.35); border-radius: var(--radius-md); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-size:1.6rem;">🚫</span>
+            <div>
+              <strong style="color:#f87171;">Unauthorized Access Defense (Phone B, C, etc.)</strong>
+              <p style="font-size:0.85rem; margin:0; color:#cbd5e1;">Any connection attempting command dispatch without a matching cryptographic token in <code>pairings.json</code> triggers an immediate <code>403 Security Violation</code> and drops the connection.</p>
+            </div>
+          </div>
+          <span class="pill-tag" style="background:rgba(239,68,68,0.2); border-color:#ef4444; color:#ef4444; font-weight:700;">BLOCKED BY DEFAULT</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step-by-Step Onboarding Guide -->
+  <section class="section" id="guide">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Getting Started</div>
+        <h2>Setup & Deployment Guide</h2>
+        <p>Follow these 3 simple steps to connect and secure your Windows machine.</p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tabs-container">
+        <button class="tab-btn active" data-tab="tab-laptop" id="tab-btn-laptop">
+          <span>1. Windows Desktop App</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-android" id="tab-btn-android">
+          <span>2. Android Mobile App</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-biometric" id="tab-btn-biometric">
+          <span>3. Biometric Security</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Windows Desktop Agent -->
+      <div class="tab-content active" id="tab-laptop">
+        <div class="glass-card guide-card">
+          <div class="guide-steps">
+            <div class="guide-step-item">
+              <div class="step-num">1</div>
+              <div class="step-details">
+                <h4>Download & Run Windows Agent</h4>
+                <p>Download <code>RemoteLaptopAgent.exe</code> or unzip the package. Run with <code>--tray</code> (or double-click <code>Start-Tray.bat</code>) to launch silently into your taskbar.</p>
+              </div>
+            </div>
+
+            <div class="guide-step-item">
+              <div class="step-num">2</div>
+              <div class="step-details">
+                <h4>Enable Auto-Start with Windows</h4>
+                <p>Right-click the tray icon and check <strong>Start with Windows</strong>. The agent registers in HKCU Run to protect your laptop automatically on login.</p>
+              </div>
+            </div>
+
+            <div class="guide-step-item">
+              <div class="step-num">3</div>
+              <div class="step-details">
+                <h4>Request Pairing PIN</h4>
+                <p>Click <strong>Pair New Phone...</strong> in the tray menu. A 6-digit numeric PIN will appear on your screen (valid for 5 minutes).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal-box">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-amber"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="terminal-title">PowerShell (Windows Desktop Agent)</span>
+              <button class="copy-btn" data-copy-target="code-laptop" id="btn-copy-laptop">Copy</button>
+            </div>
+            <pre class="terminal-body" id="code-laptop"><code># Launch downloaded agent in silent Windows System Tray mode
+.\RemoteLaptopAgent.exe --tray
+
+# Or run interactive configuration menu with pairing & tests
+.\RemoteLaptopAgent.exe</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Android App -->
+      <div class="tab-content" id="tab-android">
+        <div class="glass-card guide-card">
+          <div class="guide-steps">
+            <div class="guide-step-item">
+              <div class="step-num">1</div>
+              <div class="step-details">
+                <h4>Install the Remote Laptop App</h4>
+                <p>Download <code>RemoteLaptopControl.apk</code> directly or scan the QR code above to install on your smartphone.</p>
+              </div>
+            </div>
+
+            <div class="guide-step-item">
+              <div class="step-num">2</div>
+              <div class="step-details">
+                <h4>Enter the 6-Digit PIN</h4>
+                <p>Open the app and enter the 6-digit PIN displayed on your laptop. The app contacts the relay and receives a secure 256-bit token.</p>
+              </div>
+            </div>
+
+            <div class="guide-step-item">
+              <div class="step-num">3</div>
+              <div class="step-details">
+                <h4>Status Turns Online</h4>
+                <p>The status badge illuminates Green, and instant workstation commands become active.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal-box">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-amber"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="terminal-title">Bash / Terminal (Android App Install)</span>
+              <button class="copy-btn" data-copy-target="code-android" id="btn-copy-android">Copy</button>
+            </div>
+            <pre class="terminal-body" id="code-android"><code># Install downloaded APK on attached Android device via ADB (optional)
+adb install -r RemoteLaptopControl.apk</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Biometric Security -->
+      <div class="tab-content" id="tab-biometric">
+        <div class="glass-card guide-card">
+          <div class="guide-steps">
+            <div class="guide-step-item">
+              <div class="step-num">1</div>
+              <div class="step-details">
+                <h4>Zero-Friction Lock & Sleep</h4>
+                <p>Tap <strong>LOCK</strong> or <strong>SLEEP</strong> for immediate 1-tap workstation standby.</p>
+              </div>
+            </div>
+
+            <div class="guide-step-item">
+              <div class="step-num">2</div>
+              <div class="step-details">
+                <h4>Hardware-Guarded Restart & Shutdown</h4>
+                <p>Destructive commands display a purple <strong>GUARDED</strong> badge and require Android biometric fingerprint or screen lock PIN authentication.</p>
+              </div>
+            </div>
+
+            <div class="guide-step-item">
+              <div class="step-num">3</div>
+              <div class="step-details">
+                <h4>Graceful Emulator Fallback</h4>
+                <p>Devices without enrolled biometrics display a safety confirmation dialog so you are never locked out.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal-box">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-amber"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="terminal-title">Kotlin (BiometricPrompt Guard)</span>
+              <button class="copy-btn" data-copy-target="code-bio" id="btn-copy-bio">Copy</button>
+            </div>
+            <pre class="terminal-body" id="code-bio"><code>// MainControlScreen.kt
+fun triggerProtectedCommand(cmd: String) {
+  biometricHelper.authenticate(
+    title = "Authorize $cmd",
+    subtitle = "Confirm with biometric or device PIN",
+    onSuccess = { webSocketManager.sendCommand(cmd) },
+    onError = { showSnackbar("Canceled") }
+  )
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Dynamic Pairing Simulator -->
+  <section class="section" id="pairing-demo">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Interactive Demo</div>
+        <h2>Try the Pairing Handshake</h2>
+        <p>Experience how the 6-digit numeric PIN is verified and exchanged for a 256-bit cryptographic token.</p>
+      </div>
+
+      <div class="pairing-sim-box">
+        <div>
+          <h3>Step-by-Step PIN Simulation</h3>
+          <p style="margin: 12px 0 24px 0;">Click the button below to simulate requesting a 6-digit PIN on the Windows Desktop Agent. The simulated phone screen will receive and bind the cryptographic token.</p>
+          
+          <button class="btn btn-primary" id="btn-sim-gen-pin">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Generate Demo Pairing PIN
+          </button>
+
+          <p id="sim-pairing-status" style="margin-top: 16px; font-weight: 500; font-size: 0.92rem; color: var(--text-muted);">
+            Ready. Click above to generate code.
+          </p>
+
+          <div id="sim-token-result" style="display: none; margin-top: 16px; padding: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+            <strong style="color: #10b981; font-size: 0.82rem; text-transform: uppercase;">Bound Cryptographic Token:</strong>
+            <div id="sim-token-val" style="font-family: var(--font-mono); font-size: 0.8rem; color: #a7f3d0; word-break: break-all; margin-top: 4px;"></div>
+          </div>
+        </div>
+
+        <div class="sim-phone-screen">
+          <div style="text-align: center; font-size: 0.85rem; color: #94a3b8; font-weight: 600;">Remote Laptop Phone UI</div>
+          <div style="text-align: center; font-size: 1.1rem; color: #f8fafc; font-weight: 700; margin-top: 6px;">Enter Laptop PIN</div>
+
+          <div class="sim-pin-inputs">
+            <div class="pin-digit-box sim-pin-digit">-</div>
+            <div class="pin-digit-box sim-pin-digit">-</div>
+            <div class="pin-digit-box sim-pin-digit">-</div>
+            <div class="pin-digit-box sim-pin-digit">-</div>
+            <div class="pin-digit-box sim-pin-digit">-</div>
+            <div class="pin-digit-box sim-pin-digit">-</div>
+          </div>
+
+          <div style="text-align: center; font-size: 0.75rem; color: #64748b;">Code expires in 5 minutes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Relay Diagnostic & Health Inspector -->
+  <section class="section" id="diagnostics">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Live Inspector</div>
+        <h2>Relay Health & Diagnostics</h2>
+        <p>Direct real-time health telemetry from the active relay server process.</p>
+      </div>
+
+      <div class="diagnostic-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h3>WebSocket & HTTP Status</h3>
+            <p style="font-size: 0.9rem; margin-top: 4px;">Live health endpoint: <code>/health</code></p>
+          </div>
+          <button class="btn btn-secondary" id="btn-test-ws">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Test WebSocket Latency
+          </button>
+        </div>
+
+        <div class="diag-grid">
+          <div class="diag-card">
+            <div class="diag-title">Relay Port</div>
+            <div class="diag-value" id="diag-port">8080</div>
+          </div>
+          <div class="diag-card">
+            <div class="diag-title">HTTP Latency</div>
+            <div class="diag-value" id="diag-latency">&lt; 10ms</div>
+          </div>
+          <div class="diag-card">
+            <div class="diag-title">WebSocket Relay</div>
+            <div class="diag-value" id="diag-ws-status" style="color: #10b981;">CONNECTED</div>
+          </div>
+          <div class="diag-card">
+            <div class="diag-title">Pairing Store</div>
+            <div class="diag-value" style="color: #60a5fa;">ACTIVE (Disk)</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Live Diagnostic Frame Log:</div>
+          <pre class="terminal-body" id="ws-test-log" style="background: var(--bg-terminal); border: 1px solid var(--border-subtle); border-radius: 8px; font-size: 0.82rem; height: 120px; overflow-y: auto;">Click 'Test WebSocket Latency' above to verify real-time handshake.</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cloud Deployment Section -->
+  <section class="section" id="deploy" style="background: rgba(15, 20, 36, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <div class="pill-tag" style="margin: 0 auto 12px auto;">Cloud Deployment</div>
+        <h2>Deploy to Render, Railway, or VPS</h2>
+        <p>The relay server is packaged for seamless cloud hosting with built-in HTTP health checks.</p>
+      </div>
+
+      <div class="glass-card guide-card">
+        <div>
+          <h3>Cloud Environment Variables</h3>
+          <p style="margin: 12px 0;">Configure your cloud service provider (e.g., Render Web Service, Railway, or AWS) with standard environment variables:</p>
+          
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+            <li style="display: flex; gap: 10px; align-items: center;">
+              <code style="background: rgba(59,130,246,0.15); color: #60a5fa; padding: 4px 8px; border-radius: 4px;">PORT</code>
+              <span style="color: var(--text-muted); font-size: 0.9rem;">Auto-assigned by cloud provider (defaults to <code>8080</code>).</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: center;">
+              <code style="background: rgba(139,92,246,0.15); color: #c084fc; padding: 4px 8px; border-radius: 4px;">AGENT_SECRET</code>
+              <span style="color: var(--text-muted); font-size: 0.9rem;">Optional fallback secret (dynamic pairings are stored on disk).</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-amber"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="terminal-title">Render / Railway Build & Start</span>
+            <button class="copy-btn" data-copy-target="code-deploy" id="btn-copy-deploy">Copy</button>
+          </div>
+          <pre class="terminal-body" id="code-deploy"><code># Build Command
+npm install && npm run build
+
+# Start Command
+npm start
+
+# Health Check Path
+/health</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <span>Remote<span class="text-gradient">Laptop</span> Control</span>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+        <a href="/downloads/RemoteLaptopAgent.exe" class="nav-link" download style="color: #38bdf8; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.801"/></svg>
+          Windows Agent (.EXE)
+        </a>
+        <a href="/downloads/RemoteLaptopAgent-Windows.zip" class="nav-link" download style="color: #94a3b8; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+          Full Package (.ZIP)
+        </a>
+        <a href="/downloads/RemoteLaptopControl.apk" class="nav-link" download style="color: #10b981; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.081 12 8.081s-3.5902.3301-5.1367.8697L4.841 5.4477a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.152.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+          Android App (.APK)
+        </a>
+      </div>
+
+      <div class="footer-text">
+        &copy; 2026 Remote Laptop Control. Open Source.
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script src="/js/app.js"></script>
+</body>
+</html>

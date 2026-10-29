@@ -1,0 +1,22 @@
+{
+  "name": "remote-laptop-control-server",
+  "version": "1.0.0",
+  "description": "Secure WebSocket communication relay for Remote Laptop Control",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test:laptop": "tsx scripts/test-client.ts laptop",
+    "test:phone": "tsx scripts/test-client.ts phone"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

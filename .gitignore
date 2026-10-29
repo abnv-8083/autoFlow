@@ -1,0 +1,37 @@
+# Dependencies
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Server runtime data
+server/data/pairings.json
+
+# .NET / C#
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Android
+**/android/.gradle/
+**/android/.idea/
+**/android/.kotlin/
+**/android/local.properties
+**/android/build/
+**/android/app/build/
+**/android/captures/
+**/android/.cxx/
+*.apk.idsig
+*.keystore
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+.vscode/*
+!.vscode/settings.json
