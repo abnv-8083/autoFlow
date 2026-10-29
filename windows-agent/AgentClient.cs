@@ -13,10 +13,12 @@ public class AgentClient
     private readonly string _serverUrl;
     private readonly string _deviceId;
     private string _secretToken;
+    private ClientWebSocket? _activeClient;
 
     public bool IsConnected { get; private set; }
     public string DeviceId => _deviceId;
     public string ServerUrl => _serverUrl;
+    public string? PairedPhoneId { get; private set; }
 
     public event Action<bool>? ConnectionStatusChanged;
     public event Action<string>? AuthenticationFailed;
@@ -146,6 +148,7 @@ public class AgentClient
         while (!cancellationToken.IsCancellationRequested)
         {
             using var client = new ClientWebSocket();
+            _activeClient = client;
 
             try
             {
@@ -179,6 +182,13 @@ public class AgentClient
             {
                 Console.WriteLine($"[Agent Connection Error] {ex.Message}");
             }
+            finally
+            {
+                if (_activeClient == client)
+                {
+                    _activeClient = null;
+                }
+            }
 
             if (IsConnected)
             {
@@ -206,12 +216,15 @@ public class AgentClient
 
     private async Task AuthenticateAsync(ClientWebSocket client, CancellationToken token)
     {
+        string currentToken = LoadSavedToken() ?? _secretToken;
+        _secretToken = currentToken;
+
         var authMessage = new
         {
             type = "auth",
             deviceId = _deviceId,
             deviceType = "laptop",
-            token = _secretToken
+            token = currentToken
         };
 
         await SendJsonAsync(client, authMessage, token);
@@ -283,14 +296,8 @@ public class AgentClient
                         ConnectionStatusChanged?.Invoke(false);
                         Console.WriteLine($"[Agent Error] Authentication rejected: {message}");
 
-                        if (message.Contains("Invalid or unpaired", StringComparison.OrdinalIgnoreCase))
-                        {
-                            ClearSavedToken();
-                            _secretToken = "dev-secret-token-123";
-                            AuthenticationFailed?.Invoke(message);
-                            Console.WriteLine("[Agent Security] Stale pairing token removed. Laptop requires pairing.");
-                            Console.WriteLine("[Agent Action] Run with '--pair' or select 'Pair New Phone...' from the system tray menu to link.");
-                        }
+                        AuthenticationFailed?.Invoke(message);
+                        Console.WriteLine("[Agent Action] Laptop requires pairing. Select 'Pair New Phone...' from the system tray menu.");
                     }
                     break;
 
@@ -363,7 +370,10 @@ public class AgentClient
                     if (!string.IsNullOrEmpty(newToken))
                     {
                         _secretToken = newToken;
+                        PairedPhoneId = phoneId;
                         SaveToken(newToken);
+                        IsConnected = true;
+                        ConnectionStatusChanged?.Invoke(true);
                         PairingCompleted?.Invoke(phoneId ?? "Phone");
                         Console.WriteLine();
                         Console.WriteLine("==============================================================");
@@ -395,6 +405,40 @@ public class AgentClient
         {
             Console.WriteLine($"[Agent Error Processing Message] {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Requests a 6-digit numeric pairing PIN code directly on the active connection.
+    /// </summary>
+    public async Task RequestPairingCodeAsync(CancellationToken cancellationToken = default)
+    {
+        var client = _activeClient;
+        if (client != null && client.State == WebSocketState.Open)
+        {
+            var request = new
+            {
+                type = "request_pairing_code",
+                deviceId = _deviceId
+            };
+            await SendJsonAsync(client, request, cancellationToken);
+            return;
+        }
+
+        // If background client is not connected, connect a dedicated client
+        await StartPairingAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Unpairs the laptop by deleting the local token.
+    /// </summary>
+    public void Unpair()
+    {
+        ClearSavedToken();
+        _secretToken = "dev-secret-token-123";
+        PairedPhoneId = null;
+        IsConnected = false;
+        ConnectionStatusChanged?.Invoke(false);
+        AuthenticationFailed?.Invoke("Pairing removed by user.");
     }
 
     /// <summary>

@@ -57,6 +57,19 @@ public class TrayApplicationContext : ApplicationContext
         });
         contextMenu.Items.Add(pairItem);
 
+        // Reset Pairing Item
+        var unpairItem = new ToolStripMenuItem("Reset Pairing / Unpair", null, (_, _) =>
+        {
+            _agent.Unpair();
+            _notifyIcon.ShowBalloonTip(
+                3000,
+                "Pairing Cleared",
+                "Laptop pairing was reset. Click 'Pair New Phone...' to pair again.",
+                ToolTipIcon.Info
+            );
+        });
+        contextMenu.Items.Add(unpairItem);
+
         // Start with Windows Toggle
         _autoStartMenuItem = new ToolStripMenuItem("Start with Windows")
         {
@@ -128,6 +141,36 @@ public class TrayApplicationContext : ApplicationContext
         };
 
         // 3. Wire up Agent events
+        _agent.PairingCodeReceived += (code, expiresIn) =>
+        {
+            _syncContext.Post(_ =>
+            {
+                _notifyIcon.ShowBalloonTip(
+                    7000,
+                    "Remote Laptop - Pairing Code",
+                    $"PIN: {code}\nEnter this code on your phone app to pair (valid for {expiresIn / 60}m).",
+                    ToolTipIcon.Info
+                );
+                ShowPairingCodeWindow(code, expiresIn);
+            }, null);
+        };
+
+        _agent.PairingCompleted += phoneId =>
+        {
+            _syncContext.Post(_ =>
+            {
+                _notifyIcon.ShowBalloonTip(
+                    5000,
+                    "Pairing Succeeded!",
+                    $"Linked successfully with {phoneId}. Laptop is now ready.",
+                    ToolTipIcon.Info
+                );
+                _statusMenuItem.Text = $"Status: Online (Paired with {phoneId})";
+                _notifyIcon.Icon = CreateTrayIcon(true);
+                _notifyIcon.Text = $"Remote Laptop Control - Online ({_agent.DeviceId})";
+            }, null);
+        };
+
         _agent.AuthenticationFailed += msg =>
         {
             _syncContext.Post(_ =>
@@ -155,7 +198,7 @@ public class TrayApplicationContext : ApplicationContext
                     : "Remote Laptop Control - Offline (Reconnecting...)";
 
                 _statusMenuItem.Text = isOnline 
-                    ? "Status: Online (Relay Connected)" 
+                    ? $"Status: Online {(!string.IsNullOrEmpty(_agent.PairedPhoneId) ? $"(Paired with {_agent.PairedPhoneId})" : "(Relay Connected)")}" 
                     : "Status: Offline (Reconnecting...)";
 
                 if (isOnline)
@@ -196,39 +239,7 @@ public class TrayApplicationContext : ApplicationContext
         {
             try
             {
-                using var pairCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-                var pairingAgent = new AgentClient();
-
-                pairingAgent.PairingCodeReceived += (code, expiresIn) =>
-                {
-                    _syncContext.Post(_ =>
-                    {
-                        _notifyIcon.ShowBalloonTip(
-                            7000,
-                            "Remote Laptop - Pairing Code",
-                            $"PIN: {code}\nEnter this code on your phone app to pair (valid for {expiresIn / 60}m).",
-                            ToolTipIcon.Info
-                        );
-                        ShowPairingCodeWindow(code, expiresIn);
-                    }, null);
-                };
-
-                pairingAgent.PairingCompleted += phoneId =>
-                {
-                    _syncContext.Post(_ =>
-                    {
-                        _notifyIcon.ShowBalloonTip(
-                            5000,
-                            "Pairing Succeeded!",
-                            $"Linked successfully with {phoneId}. Laptop is now ready.",
-                            ToolTipIcon.Info
-                        );
-                        _statusMenuItem.Text = "Status: Online (Relay Connected)";
-                        _notifyIcon.Icon = CreateTrayIcon(true);
-                    }, null);
-                };
-
-                await pairingAgent.StartPairingAsync(pairCts.Token);
+                await _agent.RequestPairingCodeAsync();
             }
             catch (Exception ex)
             {
