@@ -239,6 +239,12 @@ static async Task RunLiveAgentAsync()
     };
 
     var agent = new AgentClient();
+    agent.AuthenticationFailed += msg =>
+    {
+        Console.WriteLine("\n[Pairing Tip] This laptop is not yet paired with your mobile app.");
+        Console.WriteLine("[Pairing Tip] Run 'RemoteLaptopAgent.exe --pair' to generate a 6-digit PIN and pair your phone.\n");
+    };
+
     await agent.StartAsync(cts.Token);
 }
 

@@ -53,40 +53,7 @@ public class TrayApplicationContext : ApplicationContext
         // Dynamic Pairing Item
         var pairItem = new ToolStripMenuItem("Pair New Phone...", null, (_, _) =>
         {
-            Task.Run(async () =>
-            {
-                using var pairCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-                var pairingAgent = new AgentClient();
-
-                pairingAgent.PairingCodeReceived += (code, expiresIn) =>
-                {
-                    _syncContext.Post(_ =>
-                    {
-                        _notifyIcon.ShowBalloonTip(
-                            7000,
-                            "Remote Laptop - Pairing Code",
-                            $"PIN: {code}\nEnter this code on your phone app to pair (valid for {expiresIn / 60}m).",
-                            ToolTipIcon.Info
-                        );
-                        ShowPairingCodeWindow(code, expiresIn);
-                    }, null);
-                };
-
-                pairingAgent.PairingCompleted += phoneId =>
-                {
-                    _syncContext.Post(_ =>
-                    {
-                        _notifyIcon.ShowBalloonTip(
-                            5000,
-                            "Pairing Succeeded!",
-                            $"Linked successfully with {phoneId}.",
-                            ToolTipIcon.Info
-                        );
-                    }, null);
-                };
-
-                await pairingAgent.StartPairingAsync(pairCts.Token);
-            });
+            TriggerPairing();
         });
         contextMenu.Items.Add(pairItem);
 
@@ -151,7 +118,33 @@ public class TrayApplicationContext : ApplicationContext
             );
         };
 
+        // Balloon tip click triggers pairing if offline/unpaired
+        _notifyIcon.BalloonTipClicked += (_, _) =>
+        {
+            if (!_agent.IsConnected)
+            {
+                TriggerPairing();
+            }
+        };
+
         // 3. Wire up Agent events
+        _agent.AuthenticationFailed += msg =>
+        {
+            _syncContext.Post(_ =>
+            {
+                _notifyIcon.Icon = CreateTrayIcon(false);
+                _notifyIcon.Text = $"Remote Laptop Control - Unpaired ({_agent.DeviceId})";
+                _statusMenuItem.Text = "Status: Unpaired (Click to Pair New Phone...)";
+
+                _notifyIcon.ShowBalloonTip(
+                    7000,
+                    "Remote Laptop - Pairing Needed",
+                    "This laptop needs to be paired with your phone. Click here to generate a 6-digit PIN.",
+                    ToolTipIcon.Warning
+                );
+            }, null);
+        };
+
         _agent.ConnectionStatusChanged += isOnline =>
         {
             _syncContext.Post(_ =>
@@ -194,6 +187,61 @@ public class TrayApplicationContext : ApplicationContext
         Task.Run(async () =>
         {
             await _agent.StartAsync(_cts.Token);
+        });
+    }
+
+    private void TriggerPairing()
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                using var pairCts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+                var pairingAgent = new AgentClient();
+
+                pairingAgent.PairingCodeReceived += (code, expiresIn) =>
+                {
+                    _syncContext.Post(_ =>
+                    {
+                        _notifyIcon.ShowBalloonTip(
+                            7000,
+                            "Remote Laptop - Pairing Code",
+                            $"PIN: {code}\nEnter this code on your phone app to pair (valid for {expiresIn / 60}m).",
+                            ToolTipIcon.Info
+                        );
+                        ShowPairingCodeWindow(code, expiresIn);
+                    }, null);
+                };
+
+                pairingAgent.PairingCompleted += phoneId =>
+                {
+                    _syncContext.Post(_ =>
+                    {
+                        _notifyIcon.ShowBalloonTip(
+                            5000,
+                            "Pairing Succeeded!",
+                            $"Linked successfully with {phoneId}. Laptop is now ready.",
+                            ToolTipIcon.Info
+                        );
+                        _statusMenuItem.Text = "Status: Online (Relay Connected)";
+                        _notifyIcon.Icon = CreateTrayIcon(true);
+                    }, null);
+                };
+
+                await pairingAgent.StartPairingAsync(pairCts.Token);
+            }
+            catch (Exception ex)
+            {
+                _syncContext.Post(_ =>
+                {
+                    _notifyIcon.ShowBalloonTip(
+                        4000,
+                        "Pairing Error",
+                        $"Could not connect to relay: {ex.Message}",
+                        ToolTipIcon.Error
+                    );
+                }, null);
+            }
         });
     }
 

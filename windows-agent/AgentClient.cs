@@ -19,6 +19,7 @@ public class AgentClient
     public string ServerUrl => _serverUrl;
 
     public event Action<bool>? ConnectionStatusChanged;
+    public event Action<string>? AuthenticationFailed;
     public event Action<string, int>? PairingCodeReceived;
     public event Action<string>? PairingCompleted;
     public event Action<string, bool>? CommandExecuted;
@@ -111,6 +112,23 @@ public class AgentClient
         catch (Exception ex)
         {
             Console.WriteLine($"[Agent Security Error] Failed to save paired token: {ex.Message}");
+        }
+    }
+
+    public static void ClearSavedToken()
+    {
+        try
+        {
+            string file = GetTokenFilePath();
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+                Console.WriteLine("[Agent Security] Stale or invalid token cleared from disk.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Agent Security Error] Failed to clear token: {ex.Message}");
         }
     }
 
@@ -264,6 +282,15 @@ public class AgentClient
                         IsConnected = false;
                         ConnectionStatusChanged?.Invoke(false);
                         Console.WriteLine($"[Agent Error] Authentication rejected: {message}");
+
+                        if (message.Contains("Invalid or unpaired", StringComparison.OrdinalIgnoreCase))
+                        {
+                            ClearSavedToken();
+                            _secretToken = "dev-secret-token-123";
+                            AuthenticationFailed?.Invoke(message);
+                            Console.WriteLine("[Agent Security] Stale pairing token removed. Laptop requires pairing.");
+                            Console.WriteLine("[Agent Action] Run with '--pair' or select 'Pair New Phone...' from the system tray menu to link.");
+                        }
                     }
                     break;
 

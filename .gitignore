@@ -10,6 +10,7 @@ server/data/pairings.json
 # .NET / C#
 **/bin/
 **/obj/
+**/publish/
 *.user
 *.suo
 *.userosscache
