@@ -57,8 +57,8 @@ class SecureStorage(context: Context) {
     }
 
     companion object {
-        // Change this constant when your cloud server (e.g. Render/Railway) is deployed:
-        const val DEFAULT_SERVER_URL = "wss://remote-laptop.onrender.com"
+        // Live Render Cloud Relay URL:
+        const val DEFAULT_SERVER_URL = "wss://autoflow-84pj.onrender.com"
 
         private const val KEY_SERVER_URL = "server_url"
         private const val KEY_DEVICE_ID = "device_id"

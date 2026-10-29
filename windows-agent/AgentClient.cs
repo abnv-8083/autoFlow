@@ -23,7 +23,7 @@ public class AgentClient
     public event Action<string>? PairingCompleted;
     public event Action<string, bool>? CommandExecuted;
 
-    public const string DefaultServerUrl = "wss://remote-laptop.onrender.com";
+    public const string DefaultServerUrl = "wss://autoflow-84pj.onrender.com";
 
     public AgentClient(
         string? serverUrl = null,
