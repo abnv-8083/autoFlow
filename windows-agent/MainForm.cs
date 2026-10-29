@@ -75,7 +75,14 @@ public class MainForm : Form
             WindowState = FormWindowState.Minimized;
         }
 
-        Icon = CreateTrayIcon(online: false);
+        try
+        {
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? CreateTrayIcon(online: false);
+        }
+        catch
+        {
+            Icon = CreateTrayIcon(online: false);
+        }
 
         // 1. Initialize System Tray Icon
         _notifyIcon = new NotifyIcon
